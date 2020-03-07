@@ -1,0 +1,39 @@
+#!/bin/bash
+
+[[ $BLOCK_BUTTON = "1" ]] && pavucontrol
+
+vol=$(awk '/%/ {gsub(/[\[\]]/,""); print $5}' <(amixer sget Master))
+on_off=$(awk '/%/ {gsub(/[\[\]]/,""); print $6}' <(amixer sget Master))
+
+for i in $vol
+do
+	vol1=$i
+done
+
+for i in $on_off
+do
+	mute=$i
+done
+
+if [ $mute == "off" ]
+then
+	echo " mute"
+elif [ $vol1 == "0%" ] 
+then
+	echo " $vol1"
+else
+	if [ $vol1 == "100%" ]
+	then	
+		echo " $vol1"
+	else
+		vol_int=${vol1:0:2}
+		if [ $((vol_int)) -gt 49 ]
+		then
+			echo " $vol1"
+		else
+			echo " $vol1"
+		fi
+	fi
+
+	
+fi

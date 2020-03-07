@@ -1,0 +1,16 @@
+#/bin/bash
+
+
+if [ "$(cat /sys/class/power_supply/ADP1/online)" == "1" ]
+then
+	begin=" "
+else
+	begin=""
+fi
+
+BAT0_cap=$(cat /sys/class/power_supply/BAT1/capacity)
+
+bat_icons=(               )
+ar_el=$(( $BAT0_cap /10 ))
+echo "$begin$BAT0_cap%" ${bat_icons[$ar_el]}
+

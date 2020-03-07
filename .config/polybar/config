@@ -1,0 +1,141 @@
+[global/wm]
+;https://github.com/jaagr/polybar/wiki/Configuration#global-wm-settings
+margin-top = 0
+margin-bottom = 0
+
+[settings]
+;https://github.com/jaagr/polybar/wiki/Configuration#application-settings
+throttle-output = 5
+throttle-output-for = 10
+throttle-input-for = 30
+screenchange-reload = true
+compositing-background = #5f627a
+compositing-foreground = #f2f2f2
+compositing-overline = over
+compositing-underline = over
+compositing-border = over
+
+; Define fallback values used by all module formats
+format-foreground = #292d3e
+format-background = #00FF00
+format-underline =
+format-overline =
+format-spacing =
+format-padding =
+format-margin =
+format-offset =
+
+pseudo-transparency = false
+
+[colors]
+; Nord theme ============
+background = #002b36
+foreground = #93a1a1
+alert = #bd2c40
+
+[bar/bari3]
+monitor = ${env:MONITOR:}
+width = 100%
+height = 23
+
+enable-ipc = true
+
+background = #002b36
+foreground = #93a1a1
+
+overline-size = 2
+overline-color = #bc92f8
+underline-size = 2
+underline-color = #bc92f8
+
+spacing = 1
+padding-right = 2
+module-margin-left = 0
+module-margin-right = 2
+
+modules-left = i3 
+modules-center= date
+modules-right = mymonitor myvolume cpu mybattery
+
+tray-position = right
+tray-background = #000000
+
+font-0 = "Monospace:size=10;2"
+font-1 = "Monospace:size=16;3"
+font-2 = "Font Awesome:style=Regular:pixelsize=8;1"
+font-3 = "Font Awesome:style=Solid:pixelsize=8;1"
+font-4 = "Font Awesome:pixelsize=8;1"
+
+[module/i3]
+type = internal/i3
+pin-workspaces = true
+index-sort = true
+enable-click = false
+enable-scroll = false
+wrapping-scroll = false
+reverse-scroll = false
+fuzzy-match = false
+label-focused-underline = #dc322f
+label-focused-background =  #859900
+label-unfocused-background =  #859900
+label-focused-padding = 1
+label-unfocused-padding = 1
+
+[module/date]
+type = internal/date
+format-background = #b58900
+date = %d.%m.%Y
+time = %H:%M:%S
+label =  %date%  %time%
+format-padding = 2
+height = 27
+interval=5
+
+[module/myvolume]
+type=custom/ipc
+hook-0 = ~/.config/polybar/scripts/volume_joro
+format-background = #268bd2
+click-left = pavucontrol
+click-right = amixer set Master 1+ toggle && polybar-msg hook myvolume 1
+scroll-up = amixer set Master 2%+ && polybar-msg hook myvolume 1
+scroll-down = amixer set Master 2%- && polybar-msg hook myvolume 1
+format-padding = 1
+initial = 1
+
+[module/cpu]
+type = internal/cpu
+label =  %percentage%%
+format-background = #dc322f
+; Seconds to sleep between updates
+; Default: 1
+interval = 1
+format-padding = 1
+
+[module/mybattery]
+type=custom/script
+exec=~/.config/polybar/scripts/my_battery
+interval=60
+format-padding = 1
+format-background = #859900
+
+[module/memory]
+type = internal/memory
+interval = 3
+format-background = #b58900
+format-padding = 1
+label =  %percentage_used%%
+
+[module/mymonitor]
+type=custom/ipc
+hook-0=python ~/.config/polybar/scripts/i3monitors.py
+initial = 1
+interval=1
+format-padding = 1
+format-background = #2aa198
+double-click-left =  python ~/.config/polybar/scripts/i3monitors.py external && polybar-msg hook mymonitor 1
+click-left = python ~/.config/polybar/scripts/i3monitors.py internal && polybar-msg hook mymonitor 1
+click-right = python ~/.config/polybar/scripts/i3monitors.py presentation && polybar-msg hook mymonitor 1
+scroll-up = python ~/.config/polybar/scripts/i3monitors.py right
+scroll-down = python ~/.config/polybar/scripts/i3monitors.py left
+
+

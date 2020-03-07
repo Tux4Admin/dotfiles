@@ -1,0 +1,103 @@
+#!/bin/python
+# -*- coding: utf-8 -*-
+
+import os
+import sys
+import subprocess
+
+#name of internal monitor
+internal_monitor="eDP1"
+
+#See which monitors are connected
+xrandr=os.popen("xrandr").readlines()
+
+#Search for connected monitors
+
+best_res={}
+current_monitor=""
+
+for line in xrandr:
+    pos=line.find("connected")
+    if pos != -1:
+        if line.find("disconnected") != -1:
+            continue
+        else:
+            current_monitor=line[0:(pos-1)]
+            continue
+    if current_monitor != "":
+        x=int(line[0:line.find("x")])
+        y=int(line[line.find("x")+1:line.find("x")+4])
+        best_res[current_monitor]=[x,y]
+        current_monitor=""
+
+second=""
+for i in best_res:
+    if i != internal_monitor:
+        second=i
+        break
+
+if len(sys.argv) > 1:
+    order=sys.argv[1]
+else:
+    order="None"
+
+#Read last configuration
+try:
+    with open("/home/jroith/.config/polybar/scripts/.screen", "r") as file_in:
+        screen_config=file_in.readline()
+except:
+    with open("/home/jroith/.config/polybar/scripts/.screen", "w") as file_out:
+        screen_config=""
+
+screen="DP1"
+if screen_config == "":
+    config = "internal"
+elif screen_config.find("internal") == -1:
+    config, screen = screen_config.split(";")
+else:
+    config = "internal"
+
+if config == "external" or config == "presentation":
+    if screen not in best_res:
+        order="internal"
+
+icon_set={"internal":"", "external":"", "presentation":""}
+
+if order == "startup":
+    #restore last config
+    if config != "internal":
+        order=config
+
+#Execute command acording to first parameter
+
+if order == "internal":
+    command="xrandr --output " + internal_monitor + " --auto"
+    os.system(command)
+    command="xrandr --output " + screen + " --off"
+    os.system(command)
+elif order == "external" and len(best_res) >1:
+    command="xrandr --auto"
+    os.system(command)
+    command="xrandr --output "+internal_monitor+" --off"
+    os.system(command)
+elif order == "presentation" and len(best_res) > 1:
+    #Calculate Scaling
+    scale_x=1.0 * best_res[internal_monitor][0] / best_res[second][0]
+    scale_y=1.0 * best_res[internal_monitor][1] / best_res[second][1]
+    command="xrandr --auto"
+    os.system(command)
+    command="xrandr --output " + second + " --scale " + str(scale_x)+"x"+str(scale_y)
+    os.system(command)
+else:
+    order="None"
+
+if order == "None":
+    print icon_set[config]
+else:
+    with open("/home/jroith/.config/polybar/scripts/.screen", "w") as file_out:
+        if order == "internal":
+            file_out.write(order)
+            print icon_set[order]
+        else:
+            file_out.write(order+";"+second)
+            print icon_set[order]
